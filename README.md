@@ -6,7 +6,7 @@ Fast Firefox. Source-verified config.
 
 ## Install
 
-Download [`install.bat`](../../releases/latest/download/install.bat), double-click. Firefox must be closed.
+Download [`install.bat`](https://raw.githubusercontent.com/gamer043/firefox-endgame/main/install.bat), double-click. Firefox must be closed.
 
 ```
 user.js          → <profile>/
