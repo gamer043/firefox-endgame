@@ -1565,6 +1565,25 @@ user_pref("network.fetchpriority.adjust_urgency", true);                 // defa
 
 
 // =============================================================================
+// SECTION 26aa: FINAL SWEEP — SECURITY LOCKS + PRIVACY FIXES
+// =============================================================================
+
+// --- Lock extension signature enforcement (security critical) ---
+user_pref("xpinstall.signatures.required", true);                        // default: true (lock)
+user_pref("extensions.langpacks.signatures.required", true);             // default: true (lock)
+
+// --- Don't capture passwords in Private Browsing (defeats the purpose) ---
+user_pref("signon.privateBrowsingCapture.enabled", false);               // default: true
+
+// --- Hide the "Firefox Labs" experimental features panel in Settings ---
+// (experiments are disabled anyway — this just hides the unused UI section)
+user_pref("browser.preferences.experimental", false);                    // default: true
+
+// --- Translations: don't auto-popup the panel (still works on click) ---
+user_pref("browser.translations.automaticallyPopup", false);             // default: true
+
+
+// =============================================================================
 // SECTION 27: MISCELLANEOUS BLOAT — OFF
 // =============================================================================
 
