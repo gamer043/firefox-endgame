@@ -557,13 +557,14 @@ user_pref("default-browser-agent.enabled", false);
 
 
 // =============================================================================
-// SECTION 20: FORM AUTOFILL — OFF
+// SECTION 20: FORM AUTOFILL — ENABLED
 // =============================================================================
+// Address + credit card autofill, with heuristic capture from filled forms.
 
-user_pref("extensions.formautofill.addresses.enabled", false);
-user_pref("extensions.formautofill.creditCards.enabled", false);
-user_pref("extensions.formautofill.heuristics.captureOnFormRemoval", false);
-user_pref("extensions.formautofill.heuristics.captureOnPageNavigation", false);
+user_pref("extensions.formautofill.addresses.enabled", true);            // default: true
+user_pref("extensions.formautofill.creditCards.enabled", true);          // default: true
+user_pref("extensions.formautofill.heuristics.captureOnFormRemoval", true);
+user_pref("extensions.formautofill.heuristics.captureOnPageNavigation", true);
 
 
 // =============================================================================
