@@ -38,13 +38,14 @@
 // =============================================================================
 // Source: StaticPrefList.yaml lines 7373-7800, gfx.* prefs
 //
-// CRITICAL: layers.acceleration.disabled was set to true in your prefs.js.
-// This forces SOFTWARE RENDERING for the entire browser. On an RTX 5090,
-// this is the #1 reason Firefox feels slow vs Chrome/Brave.
+// CRITICAL: many "performance" guides recommend setting
+// layers.acceleration.disabled = true to fix Discord screenshare black-rectangle
+// issues. That forces SOFTWARE RENDERING for the entire browser — by far
+// the biggest reason Firefox feels slow vs Chrome/Brave on capable hardware.
 //
 // The Discord screenshare blackscreen is caused specifically by Direct
 // Composition hardware video overlays, NOT by GPU acceleration itself.
-// We disable only the overlay layer that Discord can't capture.
+// Disabling only the overlay layer fixes Discord without killing GPU rendering.
 
 user_pref("layers.acceleration.disabled", false);
 
@@ -112,10 +113,10 @@ user_pref("network.prefetch-next", true);                    // default: true �
 user_pref("network.dns.disablePrefetch", false);             // default: false — DNS prefetch ON
 user_pref("network.dns.disablePrefetchFromHTTPS", false);    // default: false
 
-// --- Network predictor (was disabled in your prefs.js — BAD) ---
+// --- Network predictor (some "privacy" configs disable this; it hurts navigation) ---
 user_pref("network.predictor.enabled", true);                // default: true — LEARN browsing patterns
 // network.predictor.enable-hover-on-ssl / enable-prefetch / *-min-confidence
-//   -> overridden by later section (aggressive predictor — Bugzilla-validated)
+// are set further below (aggressive predictor — Bugzilla-validated).
 user_pref("network.predictor.max-resources-per-entry", 250); // default: 100 — track more subresources
 
 // --- DNS ---
@@ -150,9 +151,9 @@ user_pref("browser.cache.disk.enable", true);                // KEEP — NVMe di
 user_pref("browser.cache.memory.enable", true);              // KEEP — memory cache too
 user_pref("browser.cache.disk.smart_size.enabled", true);    // default: true — let FF size dynamically based on free disk
 user_pref("browser.cache.memory.capacity", -1);              // default: -1 — auto-size based on RAM (was wrongly capped)
-// browser.cache.disk.metadata_memory_limit -> overridden by section 26x (16 MB)
+// browser.cache.disk.metadata_memory_limit is set further below (16 MB).
 user_pref("browser.cache.disk.capacity", 1048576);           // 1 GB hint (only used if smart_size disabled, harmless otherwise)
-// browser.cache.disk.max_entry_size / memory.max_entry_size -> overridden by section 26x
+// browser.cache.disk.max_entry_size / memory.max_entry_size are set further below.
 user_pref("browser.cache.disk.preload_chunk_count", 8);      // default: 4 — read-ahead 2 MB on NVMe
 user_pref("browser.cache.disk.max_chunks_memory_usage", 81920);          // 80 MB (default: 40 MB)
 user_pref("browser.cache.disk.max_priority_chunks_memory_usage", 81920); // 80 MB (default: 40 MB)
@@ -160,13 +161,13 @@ user_pref("browser.cache.disk_cache_ssl", true);             // default: true �
 
 
 // =============================================================================
-// SECTION 4: JAVASCRIPT — JIT TUNING FOR 9950X3D
+// SECTION 4: JAVASCRIPT — JIT TUNING
 // =============================================================================
 // Source: StaticPrefList.yaml lines 8595-8980
 
 // --- JIT compilation thresholds ---
 // Lower = compile sooner = faster execution, more CPU at startup.
-// With a 9950X3D, compile cost is negligible.
+// Defaults are SpiderMonkey-tuned for typical hardware; left alone here.
 user_pref("javascript.options.baselinejit.threshold", 100);  // default: 100 — leave alone (SpiderMonkey-tuned)
 user_pref("javascript.options.ion.threshold", 1500);         // default: 1500 — leave alone (lower = more JIT churn for no real gain)
 user_pref("javascript.options.ion.offthread_compilation", true); // default: true — compile on bg thread
@@ -201,7 +202,7 @@ user_pref("javascript.options.asyncstack", false);
 // =============================================================================
 // Source: all.js line 1879, StaticPrefList.yaml lines 3341-3440
 
-// dom.ipc.processCount -> overridden by section 26y (back to 16 per research)
+// dom.ipc.processCount is set further below (16 per CPU thread).
 user_pref("dom.ipc.processPrelaunch.fission.number", 3);     // default: 3 — leave alone
 
 // --- Process priority manager ---
@@ -221,8 +222,8 @@ user_pref("fission.autostart", true);                        // default: true �
 // =============================================================================
 // Source: StaticPrefList.yaml lines 8100-8280
 
-// image.mem.decode_bytes_at_a_time -> overridden by section 26y (1 MB chunks)
-// image.mem.surfacecache.max_size_kb -> bumped to 4 GB in section 26t (audit findings)
+// image.mem.decode_bytes_at_a_time is set further below (1 MB chunks).
+// image.mem.surfacecache.max_size_kb is set further below (4 GB cap).
 user_pref("image.mem.surfacecache.size_factor", 4);           // default: 4 (1/4 RAM = 8 GB cap on 32GB box, plenty)
 user_pref("image.mem.surfacecache.min_expiration_ms", 120000);// 2 min (default: 60s)
 user_pref("image.mem.animated.discardable", false);           // don't discard animated frames — 32 GB
@@ -312,9 +313,9 @@ user_pref("security.family_safety.mode", 0);                 // default: 2
 user_pref("media.wmf.dxva.enabled", true);                   // keep HW decode even w/o overlay
 user_pref("media.hardware-video-decoding.enabled", true);
 user_pref("media.hardware-video-decoding.force-enabled", true);
-user_pref("media.wmf.vp9.enabled", true);                    // HW decode VP9 on RTX
-user_pref("media.wmf.amd.vp9.enabled", true);                // also AMD path (9950X3D has iGPU?)
-user_pref("media.wmf.av1.enabled", true);                    // HW AV1 decode (RTX 5090 has it)
+user_pref("media.wmf.vp9.enabled", true);                    // HW decode VP9
+user_pref("media.wmf.amd.vp9.enabled", true);                // AMD iGPU path
+user_pref("media.wmf.av1.enabled", true);                    // HW AV1 decode (RTX 30+, RDNA2+, Arc)
 
 // --- Media cache ---
 user_pref("media.cache_size", 1024000);                      // default: 512000 — 1 GB media cache
@@ -322,7 +323,8 @@ user_pref("media.memory_cache_max_size", 131072);            // default: 65536 �
 user_pref("media.memory_caches_combined_limit_kb", 1048576); // default: 524288 — 1 GB combined (2 GB was excessive)
 user_pref("media.memory_caches_combined_limit_pc_sysmem", 5); // default: 5 — leave alone (5% of 32 GB = 1.6 GB, plenty)
 
-// --- Picture-in-Picture (user requested off) ---
+// --- Picture-in-Picture (off — most users don't use the floating mini player)
+//     Remove these two lines if you want PiP buttons on videos.
 user_pref("media.videocontrols.picture-in-picture.enabled", false);
 user_pref("media.videocontrols.picture-in-picture.video-toggle.enabled", false);
 
@@ -753,7 +755,7 @@ user_pref("browser.search.separatePrivateDefault", false);
 user_pref("browser.search.separatePrivateDefault.ui.enabled", false);
 user_pref("browser.search.separatePrivateDefault.urlbarResult.enabled", false);
 
-// --- Suggest API (you have urlbar suggestions off, kill the master too) ---
+// --- Suggest API master kill (URL bar suggestions are off in section 16) ---
 user_pref("browser.search.suggest.enabled", false);                      // default: true
 user_pref("browser.search.suggest.enabled.private", false);              // default: false (lock)
 
@@ -889,7 +891,7 @@ user_pref("browser.places.speculativeConnect.enabled", false);           // defa
 // SECTION 26h: PROFILES & FIREFOX VIEW — OFF
 // =============================================================================
 
-// --- Built-in multi-profile picker (you have one profile) ---
+// --- Built-in multi-profile picker (disable if you only run one profile) ---
 user_pref("browser.profiles.enabled", false);                            // default: true
 
 // --- Firefox View page state ---
@@ -1079,7 +1081,7 @@ user_pref("gfx.font_rendering.opentype_svg.enabled", false);             // defa
 // --- Video buffer readahead (less mid-video network re-fetches on long YT vids) ---
 user_pref("media.cache_readahead_limit", 120);                           // default: 60 seconds
 
-// --- Page load deprioritization window (resume bg tasks sooner on 9950X3D) ---
+// --- Page load deprioritization window (resume bg tasks sooner on modern desktop CPU) ---
 user_pref("page_load.deprioritization_period", 1000);                    // default: 5000ms
 
 // --- LOCK good defaults (insurance against Mozilla flipping them later) ---
@@ -1135,7 +1137,7 @@ user_pref("gfx.canvas.accelerated.max-draw-target-count", 512);          // defa
 // --- GPU canvas: more warm empty slots ---
 user_pref("gfx.canvas.accelerated.reserve-empty-cache", 64);             // default: 36
 
-// --- Bigger WebRender shared surface (RTX 5090 has no driver bugs) ---
+// --- Bigger WebRender shared surface (discrete GPU has no driver bugs) ---
 user_pref("gfx.webrender.max-shared-surface-size", 4096);                // default: 2048 mirror:once
 
 // --- Bigger WebRender picture tiles (fewer draw calls at 4K+) ---
@@ -1402,7 +1404,7 @@ user_pref("dom.script_loader.navigation_cache", true);                   // defa
 // (the parser starts before the doc has even committed)
 user_pref("dom.script_loader.external_scripts.speculate_link_preload.enabled", true);  // default: false
 
-// --- Eager full-parse strategy (no lazy heuristic — CPU is cheap on 9950X3D) ---
+// --- Eager full-parse strategy (no lazy heuristic — CPU is cheap on modern desktop CPU) ---
 user_pref("dom.script_loader.delazification.strategy", 0);               // default: 255 (DefaultStrategy)
 
 // --- Keep service workers warm between navigations (30s → 5min) ---
@@ -1457,15 +1459,15 @@ user_pref("network.predictor.prefetch-min-confidence", 50);              // defa
 user_pref("gfx.webrender.scene-builder-thread-local-arena", true);       // bug 1612440 family
 user_pref("gfx.webrender.frame-builder-thread-local-arena", true);
 
-// --- WebRender feature locks (force-enable on RTX 5090) ---
+// --- WebRender feature locks (force-enable on discrete GPU) ---
 user_pref("gfx.webrender.enable-multithreading", true);
 user_pref("gfx.webrender.batched-texture-uploads", true);
 user_pref("gfx.webrender.use-optimized-shaders", true);
 user_pref("gfx.webrender.compositor.force-enabled", true);               // force DComp native compositor
 user_pref("gfx.webrender.dcomp-win.enabled", true);
-user_pref("gfx.webrender.allow-software-fallback", false);               // crash instead of swrast (RTX won't fail)
+user_pref("gfx.webrender.allow-software-fallback", false);               // crash instead of swrast on GPU driver fail
 user_pref("gfx.webrender.svg-images", true);                             // SVG rasterize on WR backend
-user_pref("gfx.webrender.low-quality-pinch-zoom", false);                // RTX 5090: spend GPU on quality
+user_pref("gfx.webrender.low-quality-pinch-zoom", false);                // discrete GPU: spend GPU on quality
 
 // --- Display list retention (rebuild only changed sub-trees) ---
 user_pref("layout.display-list.retain", true);
@@ -1496,9 +1498,9 @@ user_pref("apz.prefer_jank_minimal_displayports", false);                // we h
 user_pref("apz.fling_min_velocity_threshold", 0.0);
 
 // --- FOREGROUND vs BACKGROUND: starve background, give foreground everything ---
-// Win11 EcoQoS pushes bg tabs to E-cores (we don't have E-cores on 9950X3D, but
-// the Windows scheduler still de-prioritizes), and dom.min_background_timeout_value
-// floors background setTimeout(0) to 10s — your foreground gets every frame.
+// On Win11 the scheduler de-prioritizes background processes (EcoQoS on hybrid
+// CPUs). dom.min_background_timeout_value floors background setTimeout(0) to
+// 10s — the active tab gets every frame slice.
 user_pref("dom.ipc.processPriorityManager.backgroundPerceivableGracePeriodMS", 0);
 user_pref("dom.ipc.processPriorityManager.backgroundGracePeriodMS", 0);
 user_pref("dom.min_background_timeout_value", 10000);                    // bg setTimeout floored to 10s
@@ -1517,9 +1519,8 @@ user_pref("dom.ipc.processCount", 16);
 user_pref("dom.ipc.processCount.webIsolated", 16);
 user_pref("dom.ipc.keepProcessesAlive.web", 8);                          // hot pool — no fork latency
 
-// --- Override earlier conservative dom.timeout.throttling_delay ---
-// (Section 26s set it to 10000; rendering research wants more aggressive bg throttle)
-// Keeping at 10000 since 0 would be too aggressive — leave the section 26s value.
+// dom.timeout.throttling_delay is set earlier (10000ms) — keeping conservative
+// vs the more aggressive value some guides suggest.
 
 
 // =============================================================================
