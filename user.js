@@ -1587,6 +1587,62 @@ user_pref("browser.translations.automaticallyPopup", false);             // defa
 
 
 // =============================================================================
+// SECTION 26ab: HARDWARE ACCELERATION — ADDITIONAL LOCKS & TUNES
+// =============================================================================
+// Most of these are currently default-true on Windows. Locking them in user.js
+// prevents Mozilla from disabling them via remote-settings or future ESR
+// re-tuning. Some force-enable paths that Firefox would normally take only
+// when its compatibility heuristic agrees.
+
+// --- D3D11 decoder device sharing (eliminates copies between decode & display) ---
+user_pref("gfx.direct3d11.reuse-decoder-device", true);                  // default: true (lock)
+user_pref("gfx.direct3d11.reuse-decoder-device-force-enabled", true);    // default: false — force the path
+user_pref("gfx.direct3d11.allow-keyed-mutex", true);                     // default: true (lock)
+
+// --- WebRender triple buffering (Win default; lock) ---
+user_pref("gfx.webrender.triple-buffering.enabled", true);               // default: true on Win
+
+// --- WebRender scissored cache clears (avoid full-screen GPU clears each frame) ---
+user_pref("gfx.webrender.scissored-cache-clears.enabled", true);         // default: true (lock)
+
+// --- Bigger compositor surface pool (more concurrent layers cached on GPU) ---
+user_pref("gfx.webrender.compositor.surface-pool-size", 50);             // default: 25
+
+// --- Driver bug workarounds — keep ON for stability ---
+user_pref("gfx.work-around-driver-bugs", true);                          // default: true (lock)
+
+// --- Canvas accelerated paths (lock) ---
+user_pref("gfx.canvas.accelerated.async-present", true);                 // default: true (lock)
+user_pref("gfx.canvas.remote.use-canvas-translator-event", true);        // default: true (lock)
+user_pref("gfx.canvas.remote.use-draw-image-fast-path", true);           // default: true (lock)
+user_pref("gfx.canvas.remote.use-draw-image-fast-path-d3d", true);       // default: true (lock)
+
+// --- WebGPU (next-gen GPU API; RTX/RDNA2+/Arc class GPUs support this fully) ---
+user_pref("dom.webgpu.enabled", true);                                   // default: true on Win
+user_pref("dom.webgpu.allow-present-without-readback", true);            // default: true — zero-copy present
+
+// --- HEVC (H.265) hardware decode ---
+user_pref("media.hevc.enabled", true);                                   // default: true (lock)
+
+// --- Process-isolated media decode (sandboxed, harder to crash whole browser) ---
+user_pref("media.gpu-process-decoder", true);                            // default: true on Win
+user_pref("media.rdd-process.enabled", true);                            // default: true on Win
+user_pref("media.utility-process.enabled", true);                        // default: true on Win
+
+// --- AV1 software decoder (dav1d, fast SIMD path; HW decode runs in parallel) ---
+user_pref("media.av1.use-dav1d", true);                                  // default: true (lock)
+
+// --- FFmpeg customized buffer allocation (fewer copies on decode) ---
+user_pref("media.ffmpeg.customized-buffer-allocation", true);            // default: true (lock)
+
+// --- GPU process restart resilience (Win11 default = 6; lock and verify) ---
+user_pref("layers.gpu-process.max_restarts", 6);                         // default: 6 on Win
+
+// --- Don't crash whole browser if GPU process dies ---
+user_pref("layers.gpu-process.crash-also-crashes-browser", false);       // default: false (lock)
+
+
+// =============================================================================
 // SECTION 27: MISCELLANEOUS BLOAT — OFF
 // =============================================================================
 
