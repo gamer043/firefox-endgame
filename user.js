@@ -194,7 +194,8 @@ user_pref("javascript.options.compact_on_user_inactive", true);
 user_pref("javascript.options.compact_on_user_inactive_delay", 10000);     // default: 30000 — compact sooner
 
 // --- Async stacks (devtools overhead — disable) ---
-user_pref("javascript.options.asyncstack", false);
+user_pref("javascript.options.asyncstack", true);                       // default: true — needed for usable async stack traces in devtools
+user_pref("javascript.options.asyncstack_capture_debuggee_only", true); // default: true — only capture when devtools open (cheap when closed)
 
 
 // =============================================================================
@@ -650,25 +651,30 @@ user_pref("dom.vr.always_support_ar", false);
 
 
 // =============================================================================
-// SECTION 26: DEVTOOLS — OFF (not a developer in Firefox)
+// SECTION 26: DEVTOOLS — F12 ENABLED, REMOTE/CHROME DEBUGGING LOCKED OFF
 // =============================================================================
+// Devtools enabled for everyday use (inspect element, edit CSS, network tab,
+// console). Remote / chrome (browser-internal) debugging stays disabled —
+// those are attack surface, not needed for normal web debugging.
 
-user_pref("devtools.policy.disabled", true);
-user_pref("devtools.f12_enabled", false);
-user_pref("devtools.inspector.enabled", false);
-user_pref("devtools.debugger.enabled", false);
-user_pref("devtools.netmonitor.enabled", false);
-user_pref("devtools.performance.enabled", false);
-user_pref("devtools.memory.enabled", false);
-user_pref("devtools.styleeditor.enabled", false);
-user_pref("devtools.storage.enabled", false);
-user_pref("devtools.accessibility.enabled", false);
-user_pref("devtools.application.enabled", false);
-user_pref("devtools.dom.enabled", false);
-user_pref("devtools.debugger.remote-enabled", false);
-user_pref("devtools.chrome.enabled", false);
-user_pref("devtools.debugger.features.wasm", false);
-user_pref("devtools.debugger.features.javascript-tracing", false);
+user_pref("devtools.policy.disabled", false);                            // F12 / Ctrl+Shift+I works
+user_pref("devtools.f12_enabled", true);                                 // F12 hotkey on
+user_pref("devtools.inspector.enabled", true);                           // DOM inspector / element edit
+user_pref("devtools.debugger.enabled", true);                            // JS debugger
+user_pref("devtools.netmonitor.enabled", true);                          // Network tab
+user_pref("devtools.styleeditor.enabled", true);                         // CSS editor
+user_pref("devtools.storage.enabled", true);                             // cookies/localStorage/IDB inspector
+user_pref("devtools.application.enabled", true);                         // service workers / manifest panel
+user_pref("devtools.performance.enabled", true);                         // profiler
+user_pref("devtools.memory.enabled", true);                              // memory inspector
+user_pref("devtools.accessibility.enabled", true);                       // a11y tree
+user_pref("devtools.debugger.features.wasm", true);                      // wasm debug support
+
+// --- Locked OFF (security / overhead) ---
+user_pref("devtools.dom.enabled", false);                                // deprecated DOM tab (lock)
+user_pref("devtools.debugger.remote-enabled", false);                    // no remote debugging attach surface
+user_pref("devtools.chrome.enabled", false);                             // no browser-internal debugging by default
+user_pref("devtools.debugger.features.javascript-tracing", false);       // tracing overhead
 
 
 // =============================================================================
@@ -1715,6 +1721,29 @@ user_pref("identity.fxaccounts.toolbar.pxiToolbarEnabled.vpnEnabled", false);
 
 
 // =============================================================================
+// SECTION 26ae: ADDITIONAL NICETIES — STOP ANNOYING / RARELY-USED FEATURES
+// =============================================================================
+
+// --- No "beep" sound when type-ahead-find matches (' or / shortcuts) ---
+user_pref("accessibility.typeaheadfind.enablesound", false);             // default: true
+
+// --- Lock Accessibility Object Model off (default false; experimental API) ---
+user_pref("accessibility.AOM.enabled", false);                           // default: false (lock)
+
+// --- Block scripts from moving/resizing your browser window ---
+user_pref("dom.disable_window_move_resize", true);                       // default: false
+
+// --- Block scripts from focus-stealing / window flipping ---
+user_pref("dom.disable_window_flip", true);                              // default: false in all.js (firefox.js overrides to true; lock)
+
+// --- Scripts can only close windows they opened (not arbitrary tabs) ---
+user_pref("dom.allow_scripts_to_close_windows", false);                  // default: false (lock)
+
+// --- Block popups during page load (XSS / drive-by mitigation) ---
+user_pref("dom.disable_open_during_load", true);                         // default: true (lock — but explicit)
+
+
+// =============================================================================
 // SECTION 27: MISCELLANEOUS BLOAT — OFF
 // =============================================================================
 
@@ -1763,7 +1792,14 @@ user_pref("cookiebanners.ui.desktop.enabled", false);
 user_pref("security.certerrors.mitm.priming.enabled", false);
 user_pref("dom.indexedDB.logging.enabled", false);
 user_pref("dom.indexedDB.logging.details", false);
-user_pref("signon.firefoxRelay.feature", "disabled");
+// --- Firefox Relay (Mozilla email-masking subscription) — fully killed ---
+user_pref("signon.firefoxRelay.feature", "disabled");                    // default: "available"
+user_pref("signon.firefoxRelay.base_url", "");                           // default: relay.firefox.com/api/v1/
+user_pref("signon.firefoxRelay.learn_more_url", "");
+user_pref("signon.firefoxRelay.manage_url", "");
+user_pref("signon.firefoxRelay.terms_of_service_url", "");
+user_pref("signon.firefoxRelay.privacy_policy_url", "");
+user_pref("signon.firefoxRelay.firstOfferVersionFallback", "");          // default: "control" (A/B test fallback)
 
 
 // =============================================================================
