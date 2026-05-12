@@ -1,0 +1,17 @@
+# OS / editor
+.DS_Store
+Thumbs.db
+desktop.ini
+*.swp
+*.swo
+*~
+.vscode/
+.idea/
+
+# Local backups
+*.backup-*
+user.js.bak
+
+# Build artifacts
+sqlite-tools/
+sqlite3.exe

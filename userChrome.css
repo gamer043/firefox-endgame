@@ -1,0 +1,171 @@
+/*
+ * userChrome.css — Firefox UI snappiness pass
+ * ===========================================
+ * Goal: eliminate every UI animation, transition, and delay that costs frames.
+ * The browser chrome (tabs, URL bar, menus, panels) becomes instant — no fade,
+ * no slide, no smooth-anything. Pages render the same; only the surrounding
+ * Firefox UI is sped up.
+ *
+ * Requires: toolkit.legacyUserProfileCustomizations.stylesheets = true
+ * Location: <profile>/chrome/userChrome.css
+ */
+
+/* ============================================================ */
+/* KILL EVERY ANIMATION AND TRANSITION IN THE FIREFOX CHROME    */
+/* ============================================================ */
+
+*, *::before, *::after {
+  animation-duration: 0s !important;
+  animation-delay: 0s !important;
+  transition-duration: 0s !important;
+  transition-delay: 0s !important;
+}
+
+/* Even hover/focus indicators fire instantly */
+:root {
+  --animation-duration: 0s !important;
+  --tab-loading-fill-opacity-duration: 0s !important;
+}
+
+/* ============================================================ */
+/* TAB BAR — INSTANT OPEN/CLOSE, NO FADE                        */
+/* ============================================================ */
+
+.tabbrowser-tab,
+.tab-content,
+.tab-background,
+.tab-stack,
+.tab-label-container,
+.tab-icon-image,
+.tab-close-button {
+  transition: none !important;
+  animation: none !important;
+}
+
+/* Don't animate the tab moving animation when reordering */
+.tabbrowser-tab[movingtab] {
+  transition: none !important;
+}
+
+/* Skip tab loading bar animation (the throbber spin still works) */
+.tab-loading-burst {
+  display: none !important;
+}
+
+/* ============================================================ */
+/* PANELS / POPUPS / MENUS — INSTANT APPEAR                     */
+/* ============================================================ */
+
+panel, menupopup, .menupopup-arrowscrollbox,
+.panel-arrow, panelview, .panel-subview-body {
+  transition: none !important;
+  animation: none !important;
+}
+
+/* Hide the bookmark/library/etc panel arrows that animate in */
+.panel-arrowcontent {
+  animation: none !important;
+}
+
+/* ============================================================ */
+/* URL BAR — NO RESULTS DROPDOWN FADE                           */
+/* ============================================================ */
+
+#urlbar,
+#urlbar-input-container,
+.urlbarView,
+.urlbarView-row,
+.urlbarView-results {
+  transition: none !important;
+  animation: none !important;
+}
+
+/* No "growing" URL bar animation when focused */
+#urlbar[breakout][breakout-extend] {
+  transition: none !important;
+  animation: none !important;
+}
+
+/* ============================================================ */
+/* DOWNLOADS / IDENTITY / PERMISSIONS PANELS                    */
+/* ============================================================ */
+
+#downloads-button,
+#identity-box,
+#permissions-granted-icon {
+  transition: none !important;
+}
+
+/* No download animation pulse on the toolbar button */
+#downloads-button[notification="start"] > .toolbarbutton-animation-container,
+#downloads-button[notification="finish"] > .toolbarbutton-animation-container {
+  display: none !important;
+}
+
+/* ============================================================ */
+/* FULLSCREEN TRANSITIONS — NO FADE WHEN ENTERING/EXITING       */
+/* ============================================================ */
+
+#tabbrowser-tabbox,
+:root[inFullscreen] *,
+#fullscr-toggler {
+  transition: none !important;
+}
+
+/* ============================================================ */
+/* FINDBAR — INSTANT, NO SLIDE-IN                               */
+/* ============================================================ */
+
+.browserContainer > findbar {
+  transition: none !important;
+  animation: none !important;
+}
+
+/* ============================================================ */
+/* SIDEBAR — NO SLIDE                                            */
+/* ============================================================ */
+
+#sidebar-box,
+#sidebar-main {
+  transition: none !important;
+}
+
+/* ============================================================ */
+/* CONTEXT MENU INSTANT                                          */
+/* ============================================================ */
+
+#contentAreaContextMenu,
+#tabContextMenu {
+  transition: none !important;
+}
+
+/* ============================================================ */
+/* TAB LOADING INDICATOR — KEEP THROBBER, KILL BURST            */
+/* ============================================================ */
+
+.tab-throbber[busy] {
+  /* Throbber stays for feedback, just no extra burst effect */
+}
+
+/* ============================================================ */
+/* CUSTOMIZE MODE — NO ANIMATIONS                               */
+/* ============================================================ */
+
+#main-window[customizing] * {
+  transition: none !important;
+  animation: none !important;
+}
+
+/* ============================================================ */
+/* MISC SNAPPINESS                                              */
+/* ============================================================ */
+
+/* Window decoration: no rounded corner anti-alias overhead */
+@media (prefers-reduced-motion: reduce) {
+  * { animation-duration: 0s !important; transition-duration: 0s !important; }
+}
+
+/* Force prefers-reduced-motion equivalent for chrome */
+:root {
+  -moz-window-shadow: none;
+}
