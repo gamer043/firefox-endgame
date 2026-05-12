@@ -1568,9 +1568,11 @@ user_pref("network.fetchpriority.adjust_urgency", true);                 // defa
 // SECTION 26aa: FINAL SWEEP — SECURITY LOCKS + PRIVACY FIXES
 // =============================================================================
 
-// --- Lock extension signature enforcement (security critical) ---
-user_pref("xpinstall.signatures.required", true);                        // default: true (lock)
-user_pref("extensions.langpacks.signatures.required", true);             // default: true (lock)
+// --- Allow unsigned extensions (custom/self-built add-ons) ---
+// Only effective on ESR / Developer Edition / Nightly. Firefox Release ignores
+// this pref. If you only install AMO-signed extensions, set both back to true.
+user_pref("xpinstall.signatures.required", false);                       // default: true
+user_pref("extensions.langpacks.signatures.required", false);            // default: true
 
 // --- Don't capture passwords in Private Browsing (defeats the purpose) ---
 user_pref("signon.privateBrowsingCapture.enabled", false);               // default: true
